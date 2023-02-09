@@ -4,6 +4,7 @@ enum E_LEXER_STATES
 {
     case START;
     case KEYWORD;
+    case IDENTIFIER;
 }
 
 enum E_LEXER_TOKENS: string
@@ -222,6 +223,13 @@ function lexer(string $string): LexicalToken
                     }
 
                     $GLOBALS["LEXER_STRING_INDEX"]--;
+                }
+                break;
+            case E_LEXER_STATES::IDENTIFIER:
+                if (preg_match("/^[a-zA-Z]$/", $current_char)) {
+                    $token_string .= $current_char;
+                } else {
+                    return new LexicalToken($token_string, E_LEXER_TOKENS::IDENTIFIER);
                 }
                 break;
             default:
