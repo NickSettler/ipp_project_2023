@@ -6,10 +6,18 @@ enum E_LEXER_STATES
     case KEYWORD;
 }
 
-enum E_LEXER_TOKENS
+enum E_LEXER_TOKENS: string
 {
-    case IDENTIFIER;
-    case KEYWORD;
+    case END_OF_FILE = "END_OF_FILE";
+    case IDENTIFIER = "IDENTIFIER";
+    case KEYWORD_TRUE = "KEYWORD_TRUE";
+    case KEYWORD_FALSE = "KEYWORD_FALSE";
+    case COMMAND = "COMMAND";
+
+    public function toString(): string
+    {
+        return $this->value;
+    }
 }
 
 /**
@@ -164,6 +172,8 @@ function lexer($input_stream)
                     case '\r':
                         $current_char = fgetc($input_stream);
                         break;
+                    case '\0':
+                        return new LexicalToken("", E_LEXER_TOKENS::END_OF_FILE);
                     default:
                         if (preg_match("/^[a-zA-Z]$/", $current_char)) {
                             $current_state = E_LEXER_STATES::KEYWORD;
