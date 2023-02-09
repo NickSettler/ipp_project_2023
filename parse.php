@@ -25,8 +25,8 @@ class CodeCommand
      * @param string $command    The command string.
      * @param int    $args_count The number of arguments.
      */
-    public function __construct(private string $command,
-                                private int    $args_count)
+    public function __construct(private readonly string $command,
+                                private readonly int    $args_count)
     {
 
     }
