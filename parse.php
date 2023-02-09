@@ -150,6 +150,11 @@ class LexicalToken
     {
         return $this->type;
     }
+
+    public function __toString(): string
+    {
+        return "LexicalToken(value: \"" . $this->value . "\", type: " . $this->type->toString() . ")";
+    }
 }
 
 
