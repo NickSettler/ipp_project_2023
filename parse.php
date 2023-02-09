@@ -66,6 +66,7 @@ class CodeCommand
     }
 }
 
+global $CODE_COMMANDS;
 $CODE_COMMANDS = array(
     // Scopes operations, function calls and returns
     "MOVE"        => new CodeCommand("MOVE", 2),
