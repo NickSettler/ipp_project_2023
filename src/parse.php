@@ -40,8 +40,10 @@ class CodeCommand
      * @param string $command    The command string.
      * @param int    $args_count The number of arguments.
      */
-    public function __construct(private readonly string $command,
-                                private readonly int    $args_count)
+    public function __construct(
+        private readonly string $command,
+        private readonly int $args_count
+    )
     {
 
     }
@@ -132,8 +134,10 @@ class LexicalToken
      * @param string         $value The value of the token
      * @param E_LEXER_TOKENS $type  The type of the token
      */
-    public function __construct(private readonly string         $value,
-                                private readonly E_LEXER_TOKENS $type)
+    public function __construct(
+        private readonly string $value,
+        private readonly E_LEXER_TOKENS $type
+    )
     {
     }
 
@@ -159,7 +163,8 @@ class LexicalToken
 
     public function __toString(): string
     {
-        return "LexicalToken(value: \"" . $this->value . "\", type: " . $this->type->toString() . ")";
+        return "LexicalToken(value: \"" . $this->value . "\", type: "
+            . $this->type->toString() . ")";
     }
 }
 
@@ -196,61 +201,73 @@ class LexicalAnalysis
 
         while (true) {
             $this->input_string_index++;
-            if ($this->input_string_index >= strlen($this->input))
+            if ($this->input_string_index >= strlen($this->input)) {
                 $current_char = '\0';
-            else
+            } else {
                 $current_char = $this->input[$this->input_string_index];
+            }
 
             switch ($this->current_state) {
-                case E_LEXER_STATES::START:
-                    switch ($current_char) {
-                        case ' ':
-                        case '\t':
-                        case '\n':
-                        case '\r':
-                            break;
-                        case '\0':
-                            return new LexicalToken("", E_LEXER_TOKENS::END_OF_FILE);
-                        default:
-                            if (preg_match("/^[a-zA-Z]$/", $current_char)) {
-                                $this->current_state = E_LEXER_STATES::KEYWORD;
-                                $token_string .= $current_char;
-                                break;
-                            } else {
-                                throw new Exception("Unexpected character: " . $current_char);
-                            }
-                    }
+            case E_LEXER_STATES::START:
+                switch ($current_char) {
+                case ' ':
+                case '\t':
+                case '\n':
+                case '\r':
                     break;
-                case E_LEXER_STATES::KEYWORD:
+                case '\0':
+                    return new LexicalToken("", E_LEXER_TOKENS::END_OF_FILE);
+                default:
                     if (preg_match("/^[a-zA-Z]$/", $current_char)) {
+                        $this->current_state = E_LEXER_STATES::KEYWORD;
                         $token_string .= $current_char;
                         break;
                     } else {
-                        $command_keys = array_keys($GLOBALS["CODE_COMMANDS"]);
-                        $keyword_keys = array_keys($GLOBALS["KEYWORD_MAP"]);
+                        throw new Exception(
+                            "Unexpected character: " . $current_char
+                        );
+                    }
+                }
+                break;
+            case E_LEXER_STATES::KEYWORD:
+                if (preg_match("/^[a-zA-Z]$/", $current_char)) {
+                    $token_string .= $current_char;
+                    break;
+                } else {
+                    $command_keys = array_keys($GLOBALS["CODE_COMMANDS"]);
+                    $keyword_keys = array_keys($GLOBALS["KEYWORD_MAP"]);
 
-                        if (in_array($token_string, $command_keys)) {
+                    if (in_array($token_string, $command_keys)) {
+                        $this->current_state = E_LEXER_STATES::START;
+                        return new LexicalToken(
+                            $token_string, E_LEXER_TOKENS::COMMAND
+                        );
+                    } else {
+                        if (in_array($token_string, $keyword_keys)) {
                             $this->current_state = E_LEXER_STATES::START;
-                            return new LexicalToken($token_string, E_LEXER_TOKENS::COMMAND);
-                        } else if (in_array($token_string, $keyword_keys)) {
-                            $this->current_state = E_LEXER_STATES::START;
-                            return new LexicalToken($token_string, $GLOBALS["KEYWORD_MAP"][$token_string]);
+                            return new LexicalToken(
+                                $token_string,
+                                $GLOBALS["KEYWORD_MAP"][$token_string]
+                            );
                         } else {
                             $this->current_state = E_LEXER_STATES::IDENTIFIER;
                         }
-
-                        $this->input_string_index--;
                     }
-                    break;
 
-                case E_LEXER_STATES::IDENTIFIER:
-                    if (preg_match("/^[a-zA-Z]$/", $current_char)) {
-                        $token_string .= $current_char;
-                    } else {
-                        $this->current_state = E_LEXER_STATES::START;
-                        return new LexicalToken($token_string, E_LEXER_TOKENS::IDENTIFIER);
-                    }
-                    break;
+                    $this->input_string_index--;
+                }
+                break;
+
+            case E_LEXER_STATES::IDENTIFIER:
+                if (preg_match("/^[a-zA-Z]$/", $current_char)) {
+                    $token_string .= $current_char;
+                } else {
+                    $this->current_state = E_LEXER_STATES::START;
+                    return new LexicalToken(
+                        $token_string, E_LEXER_TOKENS::IDENTIFIER
+                    );
+                }
+                break;
             }
         }
     }
