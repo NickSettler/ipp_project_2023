@@ -20,6 +20,12 @@ enum E_LEXER_TOKENS: string
     }
 }
 
+global $KEYWORD_MAP;
+$KEYWORD_MAP = array(
+    "true"  => E_LEXER_TOKENS::KEYWORD_TRUE,
+    "false" => E_LEXER_TOKENS::KEYWORD_FALSE
+);
+
 /**
  * Class CodeCommand
  *
