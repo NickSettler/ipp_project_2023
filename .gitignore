@@ -4,4 +4,7 @@ composer.phar
 
 .DS_Store
 
-.phpunit.result.cache
+*.cache
+
+.idea/*
+!.idea/codeStyles/*
