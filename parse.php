@@ -125,8 +125,6 @@ $CODE_COMMANDS = array(
  */
 class LexicalToken
 {
-
-
     /**
      * LexicalToken constructor.
      *
@@ -164,17 +162,29 @@ class LexicalToken
     }
 }
 
+global $LEXER_STRING_INDEX;
+$LEXER_STRING_INDEX = -1;
 
 /**
+ * The lexer function. It returns the next token in the input string.
+ *
+ * @param string $string The input string
+ *
+ * @return LexicalToken The next token in the input string
  * @throws Exception If the character in input string is not expected
  */
-function lexer($input_stream)
+function lexer(string $string): LexicalToken
 {
-    $current_char = fgetc($input_stream);
     $current_state = E_LEXER_STATES::START;
     $token_string = "";
 
     while (true) {
+        $GLOBALS["LEXER_STRING_INDEX"]++;
+        if ($GLOBALS["LEXER_STRING_INDEX"] >= strlen($string))
+            $current_char = '\0';
+        else
+            $current_char = $string[$GLOBALS["LEXER_STRING_INDEX"]];
+
         switch ($current_state) {
             case E_LEXER_STATES::START:
                 switch ($current_char) {
@@ -182,7 +192,6 @@ function lexer($input_stream)
                     case '\t':
                     case '\n':
                     case '\r':
-                        $current_char = fgetc($input_stream);
                         break;
                     case '\0':
                         return new LexicalToken("", E_LEXER_TOKENS::END_OF_FILE);
@@ -190,7 +199,6 @@ function lexer($input_stream)
                         if (preg_match("/^[a-zA-Z]$/", $current_char)) {
                             $current_state = E_LEXER_STATES::KEYWORD;
                             $token_string .= $current_char;
-                            $current_char = fgetc($input_stream);
                             break;
                         } else {
                             throw new Exception("Unexpected character: " . $current_char);
@@ -200,11 +208,20 @@ function lexer($input_stream)
             case E_LEXER_STATES::KEYWORD:
                 if (preg_match("/^[a-zA-Z]$/", $current_char)) {
                     $token_string .= $current_char;
-                    $current_char = fgetc($input_stream);
                     break;
                 } else {
-                    $token = new LexicalToken($token_string, E_LEXER_TOKENS::KEYWORD);
-//                    echo $token->getValue() . "
+                    $command_keys = array_keys($GLOBALS["CODE_COMMANDS"]);
+                    $keyword_keys = array_keys($GLOBALS["KEYWORD_MAP"]);
+
+                    if (in_array($token_string, $command_keys)) {
+                        return new LexicalToken($token_string, E_LEXER_TOKENS::COMMAND);
+                    } else if (in_array($token_string, $keyword_keys)) {
+                        return new LexicalToken($token_string, $GLOBALS["KEYWORD_MAP"][$token_string]);
+                    } else {
+                        $current_state = E_LEXER_STATES::IDENTIFIER;
+                    }
+
+                    $GLOBALS["LEXER_STRING_INDEX"]--;
                 }
                 break;
             default:
@@ -217,13 +234,21 @@ function lexer($input_stream)
 function main()
 {
 //    $stdin = fopen("php://stdin", "r");
-    $input_string = "ac";
-    $stdin = fopen("php://memory", "r+");
-    fwrite($stdin, $input_string);
-    rewind($stdin);
+    $input_string = "ab ac false MOVE true";
+
+    /** @var LexicalToken[] $tokens */
+    $tokens = [];
 
     try {
-        lexer($stdin);
+        $token = lexer($input_string);
+        while ($token->getType() !== E_LEXER_TOKENS::END_OF_FILE) {
+            $tokens[] = $token;
+            $token = lexer($input_string);
+        }
+
+        foreach ($tokens as $token) {
+            echo $token . "\n";
+        }
     } catch (Exception $e) {
         echo $e->getMessage();
     }
