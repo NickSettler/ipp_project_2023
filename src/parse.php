@@ -50,150 +50,111 @@ class CodeCommand
 global $CODE_COMMANDS;
 $CODE_COMMANDS = [
     // Scopes operations, function calls and returns
-    'MOVE'        => new CodeCommand('MOVE', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::SYMB,
-    ]),
+    'MOVE'        => new CodeCommand(
+        'MOVE',
+        [E_ARG_TYPE::VAR, E_ARG_TYPE::SYMB]
+    ),
     'CREATEFRAME' => new CodeCommand('CREATEFRAME', []),
     'PUSHFRAME'   => new CodeCommand('PUSHFRAME', []),
     'POPFRAME'    => new CodeCommand('POPFRAME', []),
-    'DEFVAR'      => new CodeCommand('DEFVAR', [
-        E_ARG_TYPE::VAR,
-    ]),
-    'CALL'        => new CodeCommand('CALL', [
-        E_ARG_TYPE::LABEL,
-    ]),
+    'DEFVAR'      => new CodeCommand('DEFVAR', [E_ARG_TYPE::VAR]),
+    'CALL'        => new CodeCommand('CALL', [E_ARG_TYPE::LABEL]),
     'RETURN'      => new CodeCommand('RETURN', []),
 
     // Stack operations
-    'PUSHS'       => new CodeCommand('PUSHS', [
-        E_ARG_TYPE::SYMB,
-    ]),
-    'POPS'        => new CodeCommand('POPS', [
-        E_ARG_TYPE::VAR,
-    ]),
+    'PUSHS'       => new CodeCommand('PUSHS', [E_ARG_TYPE::SYMB]),
+    'POPS'        => new CodeCommand('POPS', [E_ARG_TYPE::VAR]),
 
     // Arithmetic, relation, boolean and conversion operations
-    'ADD'         => new CodeCommand('ADD', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::SYMB,
-        E_ARG_TYPE::SYMB,
-    ]),
-    'SUB'         => new CodeCommand('SUB', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::SYMB,
-        E_ARG_TYPE::SYMB,
-    ]),
-    'MUL'         => new CodeCommand('MUL', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::SYMB,
-        E_ARG_TYPE::SYMB,
-    ]),
-    'IDIV'        => new CodeCommand('IDIV', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::SYMB,
-        E_ARG_TYPE::SYMB,
-    ]),
-    'LT'          => new CodeCommand('LT', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::SYMB,
-        E_ARG_TYPE::SYMB,
-    ]),
-    'GT'          => new CodeCommand('GT', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::SYMB,
-        E_ARG_TYPE::SYMB,
-    ]),
-    'EQ'          => new CodeCommand('EQ', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::SYMB,
-        E_ARG_TYPE::SYMB,
-    ]),
-    'AND'         => new CodeCommand('AND', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::SYMB,
-        E_ARG_TYPE::SYMB,
-    ]),
-    'OR'          => new CodeCommand('OR', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::SYMB,
-        E_ARG_TYPE::SYMB,
-    ]),
-    'NOT'         => new CodeCommand('NOT', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::SYMB,
-    ]),
-    'INT2CHAR'    => new CodeCommand('INT2CHAR', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::SYMB,
-    ]),
-    'STRI2INT'    => new CodeCommand('STRI2INT', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::SYMB,
-        E_ARG_TYPE::SYMB,
-    ]),
+    'ADD'         => new CodeCommand(
+        'ADD',
+        [E_ARG_TYPE::VAR, E_ARG_TYPE::SYMB, E_ARG_TYPE::SYMB]
+    ),
+    'SUB'         => new CodeCommand(
+        'SUB',
+        [E_ARG_TYPE::VAR, E_ARG_TYPE::SYMB, E_ARG_TYPE::SYMB]
+    ),
+    'MUL'         => new CodeCommand(
+        'MUL',
+        [E_ARG_TYPE::VAR, E_ARG_TYPE::SYMB, E_ARG_TYPE::SYMB]
+    ),
+    'IDIV'        => new CodeCommand(
+        'IDIV', [E_ARG_TYPE::VAR, E_ARG_TYPE::SYMB, E_ARG_TYPE::SYMB]
+    ),
+    'LT'          => new CodeCommand(
+        'LT',
+        [E_ARG_TYPE::VAR, E_ARG_TYPE::SYMB, E_ARG_TYPE::SYMB]
+    ),
+    'GT'          => new CodeCommand(
+        'GT',
+        [E_ARG_TYPE::VAR, E_ARG_TYPE::SYMB, E_ARG_TYPE::SYMB]
+    ),
+    'EQ'          => new CodeCommand(
+        'EQ',
+        [E_ARG_TYPE::VAR, E_ARG_TYPE::SYMB, E_ARG_TYPE::SYMB]
+    ),
+    'AND'         => new CodeCommand(
+        'AND',
+        [E_ARG_TYPE::VAR, E_ARG_TYPE::SYMB, E_ARG_TYPE::SYMB]
+    ),
+    'OR'          => new CodeCommand(
+        'OR',
+        [E_ARG_TYPE::VAR, E_ARG_TYPE::SYMB, E_ARG_TYPE::SYMB]
+    ),
+    'NOT'         => new CodeCommand(
+        'NOT', [E_ARG_TYPE::VAR, E_ARG_TYPE::SYMB]
+    ),
+    'INT2CHAR'    => new CodeCommand(
+        'INT2CHAR', [E_ARG_TYPE::VAR, E_ARG_TYPE::SYMB]
+    ),
+    'STRI2INT'    => new CodeCommand(
+        'STRI2INT',
+        [E_ARG_TYPE::VAR, E_ARG_TYPE::SYMB, E_ARG_TYPE::SYMB]
+    ),
 
     // IO operations
-    'READ'        => new CodeCommand('READ', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::TYPE,
-    ]),
-    'WRITE'       => new CodeCommand('WRITE', [
-        E_ARG_TYPE::SYMB,
-    ]),
+    'READ'        => new CodeCommand(
+        'READ', [E_ARG_TYPE::VAR, E_ARG_TYPE::TYPE]
+    ),
+    'WRITE'       => new CodeCommand('WRITE', [E_ARG_TYPE::SYMB]),
 
     // String operations
-    'CONCAT'      => new CodeCommand('CONCAT', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::SYMB,
-        E_ARG_TYPE::SYMB,
-    ]),
-    'STRLEN'      => new CodeCommand('STRLEN', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::SYMB,
-    ]),
-    'GETCHAR'     => new CodeCommand('GETCHAR', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::SYMB,
-        E_ARG_TYPE::SYMB,
-    ]),
-    'SETCHAR'     => new CodeCommand('SETCHAR', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::SYMB,
-        E_ARG_TYPE::SYMB,
-    ]),
+    'CONCAT'      => new CodeCommand(
+        'CONCAT',
+        [E_ARG_TYPE::VAR, E_ARG_TYPE::SYMB, E_ARG_TYPE::SYMB]
+    ),
+    'STRLEN'      => new CodeCommand(
+        'STRLEN', [E_ARG_TYPE::VAR, E_ARG_TYPE::SYMB]
+    ),
+    'GETCHAR'     => new CodeCommand(
+        'GETCHAR',
+        [E_ARG_TYPE::VAR, E_ARG_TYPE::SYMB, E_ARG_TYPE::SYMB]
+    ),
+    'SETCHAR'     => new CodeCommand(
+        'SETCHAR',
+        [E_ARG_TYPE::VAR, E_ARG_TYPE::SYMB, E_ARG_TYPE::SYMB]
+    ),
 
     // Type operations
-    'TYPE'        => new CodeCommand('TYPE', [
-        E_ARG_TYPE::VAR,
-        E_ARG_TYPE::SYMB,
-    ]),
+    'TYPE'        => new CodeCommand(
+        'TYPE', [E_ARG_TYPE::VAR, E_ARG_TYPE::SYMB]
+    ),
 
     // Jump operations
-    'LABEL'       => new CodeCommand('LABEL', [
-        E_ARG_TYPE::LABEL,
-    ]),
-    'JUMP'        => new CodeCommand('JUMP', [
-        E_ARG_TYPE::LABEL,
-    ]),
-    'JUMPIFEQ'    => new CodeCommand('JUMPIFEQ', [
-        E_ARG_TYPE::LABEL,
-        E_ARG_TYPE::SYMB,
-        E_ARG_TYPE::SYMB,
-    ]),
-    'JUMPIFNEQ'   => new CodeCommand('JUMPIFNEQ', [
-        E_ARG_TYPE::LABEL,
-        E_ARG_TYPE::SYMB,
-        E_ARG_TYPE::SYMB,
-    ]),
-    'EXIT'        => new CodeCommand('EXIT', [
-        E_ARG_TYPE::SYMB,
-    ]),
+    'LABEL'       => new CodeCommand('LABEL', [E_ARG_TYPE::LABEL]),
+    'JUMP'        => new CodeCommand('JUMP', [E_ARG_TYPE::LABEL]),
+    'JUMPIFEQ'    => new CodeCommand(
+        'JUMPIFEQ',
+        [E_ARG_TYPE::LABEL, E_ARG_TYPE::SYMB, E_ARG_TYPE::SYMB]
+    ),
+    'JUMPIFNEQ'   => new CodeCommand(
+        'JUMPIFNEQ',
+        [E_ARG_TYPE::LABEL, E_ARG_TYPE::SYMB, E_ARG_TYPE::SYMB]
+    ),
+    'EXIT'        => new CodeCommand('EXIT', [E_ARG_TYPE::SYMB]),
 
     // Debug operations
-    'DPRINT'      => new CodeCommand('DPRINT', [
-        E_ARG_TYPE::SYMB,
-    ]),
+    'DPRINT'      => new CodeCommand('DPRINT', [E_ARG_TYPE::SYMB]),
     'BREAK'       => new CodeCommand('BREAK', []),
 ];
 
