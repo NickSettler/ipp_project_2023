@@ -598,49 +598,12 @@ function main(): void
 {
     global $CODE_COMMANDS_B;
 
-//    $input = "
-//        .IPPcode23
-//        DEFVAR GF@counter
-//        MOVE GF@counter string@ #Inicializace proměnné na prázdný řetězec #Jednoduchá iterace, dokud nebude splněna zadaná podmínka
-//        LABEL while
-//        JUMPIFEQ end GF@counter string@aaa
-//        WRITE string@Proměnná\032GF@counter\032obsahuje\032
-//        WRITE GF@counter
-//        WRITE string@12
-//        CONCAT GF@counter GF@counter string@a
-//        JUMP while
-//        LABEL end
-//    ";
-
-    $input = ".IPPcode23
-DEFVAR GF@\$x
-CALL f
-POPS GF@\$x
-DEFVAR GF@\$\$__COND_1_cond
-EQ GF@\$\$__COND_1_cond GF@\$x nil@nil
-NOT GF@\$\$__COND_1_cond GF@\$\$__COND_1_cond
-JUMPIFEQ $\$__COND_1_body GF@\$\$__COND_1_cond bool@true
-JUMPIFEQ $\$__COND_1_else GF@\$\$__COND_1_cond bool@false
-LABEL $\$__COND_1_body
-WRITE string@NOT\032NULL\010
-JUMP $\$__COND_1_end
-LABEL $\$__COND_1_else
-WRITE string@NULL\010
-JUMP $\$__COND_1_end
-LABEL $\$__COND_1_end
-EXIT int@0
-LABEL f
-CREATEFRAME
-PUSHFRAME
-PUSHS nil@nil
-POPFRAME
-RETURN";
-
-    $xw = xmlwriter_open_memory();
-    xmlwriter_set_indent($xw, 1);
-    $res = xmlwriter_set_indent_string($xw, ' ');
-
-    xmlwriter_start_document($xw, '1.0', 'UTF-8');
+    $input = ".IPPcode23  # nacteni vstupu a vypis
+DEFVAR GF@a
+READ GF@a int
+WRITE GF@a
+WRITE string@\032<not-tag/>\032 # řetězec převádíme, aby byl správně uložen do XML elementu
+WRITE bool@true#zapisujeme malými písmeny";
 
     $input = remove_comments($input);
 
