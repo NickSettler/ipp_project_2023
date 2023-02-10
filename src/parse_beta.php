@@ -629,6 +629,10 @@ WRITE bool@true#zapisujeme malými písmeny";
 
         $argumentsArray = explode(' ', $commandArray[1], $argumentsCount);
 
+        is_args_right($commandArray[0], $argumentsArray);
+
+        $args = [];
+
         foreach ($argumentsArray as $key => $value) {
             $argType = $currentCommand->getArgs()[$key];
 
