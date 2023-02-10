@@ -8,6 +8,9 @@ enum E_ARG_TYPE
     case TYPE;
 }
 
+/**
+ * Class CodeCommand. Represents a command in the code.
+ */
 class CodeCommand
 {
     /**
@@ -26,7 +29,7 @@ class CodeCommand
     /**
      * Getter for the command
      *
-     * @return string
+     * @return string The command
      */
     public function getCommand(): string
     {
@@ -34,7 +37,9 @@ class CodeCommand
     }
 
     /**
-     * @return array
+     * Getter for the arguments of the command
+     *
+     * @return E_ARG_TYPE[] The arguments of the command
      */
     public function getArgs(): array
     {
@@ -194,14 +199,19 @@ $CODE_COMMANDS = [
 
 class CodeCommandArgument
 {
+    /** @var string|null label for "label" non-terminal */
     private ?string $label = null;
 
+    /** @var string|null frame for "var" non-terminal */
     private ?string $frame = null;
 
+    /** @var string|null var for "var" non-terminal */
     private ?string $var = null;
 
+    /** @var string|null symb for "symb" non-terminal */
     private ?string $symb = null;
 
+    /** @var string|null type for "type"|"symb" non-terminal */
     private ?string $type = null;
 
     public function __construct(
@@ -211,6 +221,12 @@ class CodeCommandArgument
         $this->processInput();
     }
 
+    /**
+     * Process input and set appropriate properties based on argument type and
+     * input value.
+     *
+     * @return void
+     */
     private function processInput(): void
     {
         $allowedTyped = ['int', 'bool', 'string', 'nil'];
@@ -296,6 +312,17 @@ class CodeCommandArgument
         }
     }
 
+    /**
+     * Check if variable name is valid. Must satisfy following conditions:
+     * - must start with letter, underscore, dollar sign, ampersand, percent,
+     *   asterisk, exclamation mark or question mark
+     * - can contain only letters, numbers, underscore, dollar sign, ampersand,
+     *   percent, asterisk, exclamation mark or question mark
+     *
+     * @param string $name Variable name to check
+     *
+     * @return void
+     */
     private function checkVariableName(string $name): void
     {
         $allowedSpecialCharacters = ['_', '-', '$', '&', '%', '*', '!', '?'];
@@ -319,6 +346,13 @@ class CodeCommandArgument
         }
     }
 
+    /**
+     * Check if the string is a valid boolean. Must be either 'true' or 'false'.
+     *
+     * @param string $bool The string with the boolean to check.
+     *
+     * @return void
+     */
     private function checkBool(string $bool): void
     {
         if ($bool !== 'true' && $bool !== 'false') {
@@ -327,6 +361,14 @@ class CodeCommandArgument
         }
     }
 
+    /**
+     * Check if the string is a valid int. Must satisfy the following
+     * regular expression: ^[-+]?[0-9]+$
+     *
+     * @param string $int The string with the int to check.
+     *
+     * @return void
+     */
     private function checkInt(string $int): void
     {
         if (preg_match('/^[-+]?[0-9]+$/', $int) === 0) {
@@ -339,6 +381,15 @@ class CodeCommandArgument
     {
     }
 
+    /**
+     * Process the string to escape special characters. Ranges from 0 to 32,
+     * 35 and 92 are escaped. The escape sequence is \ followed by the
+     * octal representation of the character.
+     *
+     * @param string $string The string to process.
+     *
+     * @return string The processed string.
+     */
     private function processString(string $string): string
     {
         for ($i = 0; $i < strlen($string); $i++) {
@@ -357,6 +408,14 @@ class CodeCommandArgument
         return $string;
     }
 
+    /**
+     * Check if the nil is valid. Must satisfy the following pattern: nil@nil
+     * Otherwise, the program will exit with error code 23.
+     *
+     * @param string $nil The string to check.
+     *
+     * @return void
+     */
     private function checkNil(string $nil): void
     {
         if ($nil !== 'nil') {
@@ -366,7 +425,9 @@ class CodeCommandArgument
     }
 
     /**
-     * @return string|null
+     * Get the label of the argument.
+     *
+     * @return string|null The label of the argument.
      */
     public function getLabel(): ?string
     {
@@ -374,7 +435,9 @@ class CodeCommandArgument
     }
 
     /**
-     * @return string|null
+     * Get the frame of the variable in the argument.
+     *
+     * @return string|null The frame of the variable in the argument.
      */
     public function getFrame(): ?string
     {
@@ -382,7 +445,9 @@ class CodeCommandArgument
     }
 
     /**
-     * @return string|null
+     * Get the variable name in the argument.
+     *
+     * @return string|null The variable name in the argument.
      */
     public function getVar(): ?string
     {
@@ -390,7 +455,9 @@ class CodeCommandArgument
     }
 
     /**
-     * @return string|null
+     * Get the symbolic value in the argument.
+     *
+     * @return string|null The symbolic value in the argument.
      */
     public function getSymb(): ?string
     {
@@ -398,19 +465,33 @@ class CodeCommandArgument
     }
 
     /**
-     * @return string|null
+     * Get the type of the argument.
+     *
+     * @return string|null The type of the argument.
      */
     public function getType(): ?string
     {
         return $this->type;
     }
 
+    /**
+     * Get the type of the operand.
+     *
+     * @return E_ARG_TYPE The type of the operand.
+     */
     public function getArgType(): E_ARG_TYPE
     {
         return $this->argType;
     }
 }
 
+/**
+ * Removes comments and useless symbols from the input.
+ *
+ * @param string $input The input to process.
+ *
+ * @return string The processed input.
+ */
 function remove_comments(string $input): string
 {
     $input = preg_replace('/#.*$/m', '', $input);
@@ -423,6 +504,14 @@ function remove_comments(string $input): string
     return preg_replace('/^\R/', '', $input);
 }
 
+/**
+ * Checks if the command is correct. If there's no such command, the program
+ * exits with error code 22.
+ *
+ * @param string $command The command to check.
+ *
+ * @return void
+ */
 function is_command_right(string $command): void
 {
     global $CODE_COMMANDS;
@@ -433,6 +522,14 @@ function is_command_right(string $command): void
     }
 }
 
+/**
+ * Checks if the number of arguments is correct.
+ *
+ * @param string $command   The command to check.
+ * @param array  $argsArray The array of arguments.
+ *
+ * @return bool True if the number of arguments is correct.
+ */
 function is_args_right(string $command, array $argsArray): bool
 {
     global $CODE_COMMANDS;
@@ -451,6 +548,12 @@ function is_args_right(string $command, array $argsArray): bool
     return true;
 }
 
+/**
+ * Class XMLManager.
+ *
+ * The *Singleton* XMLManager class. This class is responsible for
+ * processing instructions and generating XML output.
+ */
 class XMLManager
 {
     private XMLWriter $xw;
@@ -484,6 +587,11 @@ class XMLManager
         return $instance;
     }
 
+    /**
+     * Start the program element.
+     *
+     * @return void
+     */
     public function startProgram(): void
     {
         xmlwriter_start_element($this->xw, 'program');
@@ -492,6 +600,11 @@ class XMLManager
         xmlwriter_end_attribute($this->xw);
     }
 
+    /**
+     * End the program element.
+     *
+     * @return void
+     */
     public function endProgram(): void
     {
         xmlwriter_end_element($this->xw);
