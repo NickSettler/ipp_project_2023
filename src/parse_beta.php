@@ -457,6 +457,143 @@ function is_args_right(string $command, array $argsArray): bool
     return true;
 }
 
+class XMLManager
+{
+    private XMLWriter $xw;
+
+    /**
+     * XMLManager constructor.
+     *
+     * Private constructor to prevent creating a new instance of the
+     * *Singleton* via the `new` operator from outside of this class.
+     */
+    private function __construct()
+    {
+        $this->xw = xmlwriter_open_memory();
+        xmlwriter_set_indent($this->xw, 1);
+        $res = xmlwriter_set_indent_string($this->xw, ' ');
+
+        xmlwriter_start_document($this->xw, '1.0', 'UTF-8');
+    }
+
+    /**
+     * Get the XMLManager instance.
+     *
+     * @return XMLManager the *Singleton* instance.
+     */
+    public static function getInstance(): XMLManager
+    {
+        static $instance = null;
+        if ($instance === null) {
+            $instance = new XMLManager();
+        }
+        return $instance;
+    }
+
+    public function startProgram(): void
+    {
+        xmlwriter_start_element($this->xw, 'program');
+        xmlwriter_start_attribute($this->xw, 'language');
+        xmlwriter_text($this->xw, 'IPPcode23');
+        xmlwriter_end_attribute($this->xw);
+    }
+
+    public function endProgram(): void
+    {
+        xmlwriter_end_element($this->xw);
+        xmlwriter_end_document($this->xw);
+    }
+
+    /**
+     * Generate instruction element with attributes and nested arguments.
+     *
+     * @param string                $command       The command to generate.
+     * @param int                   $order         The order of the
+     *                                             instruction.
+     * @param CodeCommandArgument[] $args          The arguments of the
+     *                                             instruction.
+     *
+     * @return void
+     */
+    public function addInstruction(
+        string $command,
+        int $order,
+        array $args
+    ): void
+    {
+        global $CODE_COMMANDS_B;
+        $currentCommand = $CODE_COMMANDS_B[$command];
+        $argumentsCount = count($currentCommand->getArgs());
+
+        xmlwriter_start_element($this->xw, 'instruction');
+
+        xmlwriter_start_attribute($this->xw, 'order');
+        xmlwriter_text($this->xw, $order);
+        xmlwriter_end_attribute($this->xw);
+
+        xmlwriter_start_attribute($this->xw, 'opcode');
+        xmlwriter_text($this->xw, strtoupper($command));
+        xmlwriter_end_attribute($this->xw);
+
+        if ($argumentsCount === 0) {
+            xmlwriter_end_element($this->xw);
+            return;
+        }
+
+        foreach ($args as $index => $arg) {
+            $this->addAttribute($index, $arg);
+        }
+
+        xmlwriter_end_element($this->xw);
+    }
+
+    /**
+     * Add attribute to the instruction element.
+     *
+     * @param int                 $index The index of the argument.
+     * @param CodeCommandArgument $arg   The argument to add.
+     *
+     * @return void
+     */
+    public function addAttribute(int $index, CodeCommandArgument $arg
+    ): void
+    {
+        xmlwriter_start_element($this->xw, 'arg' . $index + 1);
+        xmlwriter_start_attribute($this->xw, 'type');
+
+        if ($arg->getArgType() === E_ARG_TYPE::LABEL) {
+            xmlwriter_text($this->xw, 'label');
+        } elseif ($arg->getArgType() === E_ARG_TYPE::TYPE) {
+            xmlwriter_text($this->xw, 'type');
+        } elseif ($arg->getArgType() === E_ARG_TYPE::VAR) {
+            xmlwriter_text($this->xw, 'var');
+        } elseif ($arg->getArgType() === E_ARG_TYPE::SYMB) {
+            xmlwriter_text($this->xw, $arg->getType());
+        }
+
+        xmlwriter_end_attribute($this->xw);
+
+        if ($arg->getArgType() === E_ARG_TYPE::LABEL) {
+            xmlwriter_text($this->xw, $arg->getLabel());
+        } elseif ($arg->getArgType() === E_ARG_TYPE::TYPE) {
+            xmlwriter_text($this->xw, $arg->getType());
+        } elseif ($arg->getArgType() === E_ARG_TYPE::VAR) {
+            xmlwriter_text(
+                $this->xw, $arg->getFrame() . "@" . $arg->getVar()
+            );
+        } elseif ($arg->getArgType() === E_ARG_TYPE::SYMB) {
+            xmlwriter_text($this->xw, $arg->getSymb());
+        }
+
+        xmlwriter_end_element($this->xw);
+    }
+
+    public function output(): string
+    {
+        return xmlwriter_output_memory($this->xw);
+    }
+}
+
 function main(): void
 {
     global $CODE_COMMANDS_B;
@@ -509,10 +646,7 @@ RETURN";
 
     $lines = preg_split('/\R/', $input);
 
-    xmlwriter_start_element($xw, 'program');
-    xmlwriter_start_attribute($xw, 'language');
-    xmlwriter_text($xw, 'IPPcode23');
-    xmlwriter_end_attribute($xw);
+    XMLManager::getInstance()->startProgram();
 
     foreach ($lines as $index => $line) {
         if ($index === 0) {
@@ -527,69 +661,27 @@ RETURN";
 
         is_command_right($commandArray[0]);
 
-        /** @var CodeCommandB $currentCommand */
         $currentCommand = $CODE_COMMANDS_B[$commandArray[0]];
         $argumentsCount = count($currentCommand->getArgs());
-
-        xmlwriter_start_element($xw, 'instruction');
-        xmlwriter_start_attribute($xw, 'order');
-        xmlwriter_text($xw, $index);
-        xmlwriter_end_attribute($xw);
-        xmlwriter_start_attribute($xw, 'opcode');
-        xmlwriter_text($xw, strtoupper($currentCommand->getCommand()));
-        xmlwriter_end_attribute($xw);
-
-
-        if ($argumentsCount === 0) {
-            xmlwriter_end_element($xw);
-            continue;
-        }
 
         $argumentsArray = explode(' ', $commandArray[1], $argumentsCount);
 
         foreach ($argumentsArray as $key => $value) {
-            $argType = $currentCommand->getArgs()[$key]->getType();
+            $argType = $currentCommand->getArgs()[$key];
 
-            $parsedCommand = new CodeCommandArgumentParsed($argType, $value);
+            $parsedCommand = new CodeCommandArgument($argType, $value);
 
-            xmlwriter_start_element($xw, 'arg' . $key + 1);
-            xmlwriter_start_attribute($xw, 'type');
-
-            if ($parsedCommand->getArgType() === E_ARG_TYPE::LABEL) {
-                xmlwriter_text($xw, 'label');
-            } elseif ($parsedCommand->getArgType() === E_ARG_TYPE::TYPE) {
-                xmlwriter_text($xw, 'type');
-            } elseif ($parsedCommand->getArgType() === E_ARG_TYPE::VAR) {
-                xmlwriter_text($xw, 'var');
-            } elseif ($parsedCommand->getArgType() === E_ARG_TYPE::SYMB) {
-                xmlwriter_text($xw, $parsedCommand->getType());
-            }
-
-            xmlwriter_end_attribute($xw);
-
-            if ($parsedCommand->getArgType() === E_ARG_TYPE::LABEL) {
-                xmlwriter_text($xw, $parsedCommand->getLabel());
-            } elseif ($parsedCommand->getArgType() === E_ARG_TYPE::TYPE) {
-                xmlwriter_text($xw, $parsedCommand->getType());
-            } elseif ($parsedCommand->getArgType() === E_ARG_TYPE::VAR) {
-                xmlwriter_text(
-                    $xw,
-                    $parsedCommand->getFrame() . "@" . $parsedCommand->getVar()
-                );
-            } elseif ($parsedCommand->getArgType() === E_ARG_TYPE::SYMB) {
-                xmlwriter_text($xw, $parsedCommand->getSymb());
-            }
-
-            xmlwriter_end_element($xw);
+            $args[] = $parsedCommand;
         }
 
-        xmlwriter_end_element($xw);
+        XMLManager::getInstance()->addInstruction(
+            $currentCommand->getCommand(), $index, $args
+        );
     }
 
-    xmlwriter_end_element($xw);
-    xmlwriter_end_document($xw);
+    XMLManager::getInstance()->endProgram();
 
-    echo xmlwriter_output_memory($xw);
+    echo XMLManager::getInstance()->output();
 }
 
 main();
