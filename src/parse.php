@@ -409,11 +409,6 @@ class CodeCommandArgument
     {
         return $this->argType;
     }
-
-    public function getInput(): string
-    {
-        return $this->input;
-    }
 }
 
 function remove_comments(string $input): string
@@ -424,9 +419,8 @@ function remove_comments(string $input): string
     $input = preg_replace('/^\h*$/m', '', $input);
     $input = preg_replace('/\R\R+/', "\n", $input);
     $input = preg_replace('/\R$/', '', $input);
-    $input = preg_replace('/^\R/', '', $input);
 
-    return $input;
+    return preg_replace('/^\R/', '', $input);
 }
 
 function is_command_right(string $command): void
@@ -471,7 +465,7 @@ class XMLManager
     {
         $this->xw = xmlwriter_open_memory();
         xmlwriter_set_indent($this->xw, 1);
-        $res = xmlwriter_set_indent_string($this->xw, ' ');
+        xmlwriter_set_indent_string($this->xw, ' ');
 
         xmlwriter_start_document($this->xw, '1.0', 'UTF-8');
     }
