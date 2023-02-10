@@ -446,10 +446,10 @@ function is_args_right(string $command, array $argsArray): bool
     /** @var CodeCommandB $currentCommand */
     $currentCommand = $CODE_COMMANDS_B[$command];
 
-    if (count($argsArray) !== count($currentCommand->getArgs()) + 1) {
-        printf(
+    if (count($argsArray) !== count($currentCommand->getArgs())) {
+        fprintf(
             STDERR, 'Wrong number of arguments for command: %s' . PHP_EOL,
-            $argsArray[0]
+            $command
         );
         exit(23);
     }
