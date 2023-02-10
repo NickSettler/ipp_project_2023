@@ -192,7 +192,7 @@ $CODE_COMMANDS_B = [
     'BREAK'       => new CodeCommandB('BREAK', []),
 ];
 
-class CodeCommandArgumentParsed
+class CodeCommandArgument
 {
     private ?string $label = null;
 
