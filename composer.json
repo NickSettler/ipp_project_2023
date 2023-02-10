@@ -18,5 +18,8 @@
   },
   "scripts": {
     "test": "phpunit tests"
+  },
+  "require": {
+    "ext-xmlwriter": "*"
   }
 }
