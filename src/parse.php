@@ -8,7 +8,7 @@ enum E_ARG_TYPE
     case TYPE;
 }
 
-class CodeCommandB
+class CodeCommand
 {
     /**
      * CodeCommand constructor.
@@ -42,154 +42,154 @@ class CodeCommandB
     }
 }
 
-global $CODE_COMMANDS_B;
-$CODE_COMMANDS_B = [
+global $CODE_COMMANDS;
+$CODE_COMMANDS = [
     // Scopes operations, function calls and returns
-    'MOVE'        => new CodeCommandB('MOVE', [
+    'MOVE'        => new CodeCommand('MOVE', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::SYMB,
     ]),
-    'CREATEFRAME' => new CodeCommandB('CREATEFRAME', []),
-    'PUSHFRAME'   => new CodeCommandB('PUSHFRAME', []),
-    'POPFRAME'    => new CodeCommandB('POPFRAME', []),
-    'DEFVAR'      => new CodeCommandB('DEFVAR', [
+    'CREATEFRAME' => new CodeCommand('CREATEFRAME', []),
+    'PUSHFRAME'   => new CodeCommand('PUSHFRAME', []),
+    'POPFRAME'    => new CodeCommand('POPFRAME', []),
+    'DEFVAR'      => new CodeCommand('DEFVAR', [
         E_ARG_TYPE::VAR,
     ]),
-    'CALL'        => new CodeCommandB('CALL', [
+    'CALL'        => new CodeCommand('CALL', [
         E_ARG_TYPE::LABEL,
     ]),
-    'RETURN'      => new CodeCommandB('RETURN', []),
+    'RETURN'      => new CodeCommand('RETURN', []),
 
     // Stack operations
-    'PUSHS'       => new CodeCommandB('PUSHS', [
+    'PUSHS'       => new CodeCommand('PUSHS', [
         E_ARG_TYPE::SYMB,
     ]),
-    'POPS'        => new CodeCommandB('POPS', [
+    'POPS'        => new CodeCommand('POPS', [
         E_ARG_TYPE::VAR,
     ]),
 
     // Arithmetic, relation, boolean and conversion operations
-    'ADD'         => new CodeCommandB('ADD', [
+    'ADD'         => new CodeCommand('ADD', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::SYMB,
         E_ARG_TYPE::SYMB,
     ]),
-    'SUB'         => new CodeCommandB('SUB', [
+    'SUB'         => new CodeCommand('SUB', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::SYMB,
         E_ARG_TYPE::SYMB,
     ]),
-    'MUL'         => new CodeCommandB('MUL', [
+    'MUL'         => new CodeCommand('MUL', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::SYMB,
         E_ARG_TYPE::SYMB,
     ]),
-    'IDIV'        => new CodeCommandB('IDIV', [
+    'IDIV'        => new CodeCommand('IDIV', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::SYMB,
         E_ARG_TYPE::SYMB,
     ]),
-    'LT'          => new CodeCommandB('LT', [
+    'LT'          => new CodeCommand('LT', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::SYMB,
         E_ARG_TYPE::SYMB,
     ]),
-    'GT'          => new CodeCommandB('GT', [
+    'GT'          => new CodeCommand('GT', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::SYMB,
         E_ARG_TYPE::SYMB,
     ]),
-    'EQ'          => new CodeCommandB('EQ', [
+    'EQ'          => new CodeCommand('EQ', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::SYMB,
         E_ARG_TYPE::SYMB,
     ]),
-    'AND'         => new CodeCommandB('AND', [
+    'AND'         => new CodeCommand('AND', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::SYMB,
         E_ARG_TYPE::SYMB,
     ]),
-    'OR'          => new CodeCommandB('OR', [
+    'OR'          => new CodeCommand('OR', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::SYMB,
         E_ARG_TYPE::SYMB,
     ]),
-    'NOT'         => new CodeCommandB('NOT', [
+    'NOT'         => new CodeCommand('NOT', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::SYMB,
     ]),
-    'INT2CHAR'    => new CodeCommandB('INT2CHAR', [
+    'INT2CHAR'    => new CodeCommand('INT2CHAR', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::SYMB,
     ]),
-    'STRI2INT'    => new CodeCommandB('STRI2INT', [
+    'STRI2INT'    => new CodeCommand('STRI2INT', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::SYMB,
         E_ARG_TYPE::SYMB,
     ]),
 
     // IO operations
-    'READ'        => new CodeCommandB('READ', [
+    'READ'        => new CodeCommand('READ', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::TYPE,
     ]),
-    'WRITE'       => new CodeCommandB('WRITE', [
+    'WRITE'       => new CodeCommand('WRITE', [
         E_ARG_TYPE::SYMB,
     ]),
 
     // String operations
-    'CONCAT'      => new CodeCommandB('CONCAT', [
+    'CONCAT'      => new CodeCommand('CONCAT', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::SYMB,
         E_ARG_TYPE::SYMB,
     ]),
-    'STRLEN'      => new CodeCommandB('STRLEN', [
+    'STRLEN'      => new CodeCommand('STRLEN', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::SYMB,
     ]),
-    'GETCHAR'     => new CodeCommandB('GETCHAR', [
+    'GETCHAR'     => new CodeCommand('GETCHAR', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::SYMB,
         E_ARG_TYPE::SYMB,
     ]),
-    'SETCHAR'     => new CodeCommandB('SETCHAR', [
+    'SETCHAR'     => new CodeCommand('SETCHAR', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::SYMB,
         E_ARG_TYPE::SYMB,
     ]),
 
     // Type operations
-    'TYPE'        => new CodeCommandB('TYPE', [
+    'TYPE'        => new CodeCommand('TYPE', [
         E_ARG_TYPE::VAR,
         E_ARG_TYPE::SYMB,
     ]),
 
     // Jump operations
-    'LABEL'       => new CodeCommandB('LABEL', [
+    'LABEL'       => new CodeCommand('LABEL', [
         E_ARG_TYPE::LABEL,
     ]),
-    'JUMP'        => new CodeCommandB('JUMP', [
+    'JUMP'        => new CodeCommand('JUMP', [
         E_ARG_TYPE::LABEL,
     ]),
-    'JUMPIFEQ'    => new CodeCommandB('JUMPIFEQ', [
-        E_ARG_TYPE::LABEL,
-        E_ARG_TYPE::SYMB,
-        E_ARG_TYPE::SYMB,
-    ]),
-    'JUMPIFNEQ'   => new CodeCommandB('JUMPIFNEQ', [
+    'JUMPIFEQ'    => new CodeCommand('JUMPIFEQ', [
         E_ARG_TYPE::LABEL,
         E_ARG_TYPE::SYMB,
         E_ARG_TYPE::SYMB,
     ]),
-    'EXIT'        => new CodeCommandB('EXIT', [
+    'JUMPIFNEQ'   => new CodeCommand('JUMPIFNEQ', [
+        E_ARG_TYPE::LABEL,
+        E_ARG_TYPE::SYMB,
+        E_ARG_TYPE::SYMB,
+    ]),
+    'EXIT'        => new CodeCommand('EXIT', [
         E_ARG_TYPE::SYMB,
     ]),
 
     // Debug operations
-    'DPRINT'      => new CodeCommandB('DPRINT', [
+    'DPRINT'      => new CodeCommand('DPRINT', [
         E_ARG_TYPE::SYMB,
     ]),
-    'BREAK'       => new CodeCommandB('BREAK', []),
+    'BREAK'       => new CodeCommand('BREAK', []),
 ];
 
 class CodeCommandArgument
@@ -431,9 +431,9 @@ function remove_comments(string $input): string
 
 function is_command_right(string $command): void
 {
-    global $CODE_COMMANDS_B;
+    global $CODE_COMMANDS;
 
-    if (!in_array(strtoupper($command), array_keys($CODE_COMMANDS_B))) {
+    if (!in_array(strtoupper($command), array_keys($CODE_COMMANDS))) {
         fprintf(STDERR, 'Unknown command: %s' . PHP_EOL, $command);
         exit(22);
     }
@@ -441,10 +441,10 @@ function is_command_right(string $command): void
 
 function is_args_right(string $command, array $argsArray): bool
 {
-    global $CODE_COMMANDS_B;
+    global $CODE_COMMANDS;
 
-    /** @var CodeCommandB $currentCommand */
-    $currentCommand = $CODE_COMMANDS_B[$command];
+    /** @var CodeCommand $currentCommand */
+    $currentCommand = $CODE_COMMANDS[$command];
 
     if (count($argsArray) !== count($currentCommand->getArgs())) {
         fprintf(
@@ -521,8 +521,8 @@ class XMLManager
         array $args
     ): void
     {
-        global $CODE_COMMANDS_B;
-        $currentCommand = $CODE_COMMANDS_B[$command];
+        global $CODE_COMMANDS;
+        $currentCommand = $CODE_COMMANDS[$command];
         $argumentsCount = count($currentCommand->getArgs());
 
         xmlwriter_start_element($this->xw, 'instruction');
@@ -596,7 +596,7 @@ class XMLManager
 
 function main(): void
 {
-    global $CODE_COMMANDS_B;
+    global $CODE_COMMANDS;
 
     $input = ".IPPcode23  # nacteni vstupu a vypis
 DEFVAR GF@a
@@ -624,7 +624,7 @@ WRITE bool@true#zapisujeme malými písmeny";
 
         is_command_right($commandArray[0]);
 
-        $currentCommand = $CODE_COMMANDS_B[$commandArray[0]];
+        $currentCommand = $CODE_COMMANDS[$commandArray[0]];
         $argumentsCount = count($currentCommand->getArgs());
 
         $argumentsArray = explode(' ', $commandArray[1], $argumentsCount);
