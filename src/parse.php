@@ -1,49 +1,26 @@
 <?php
 
-enum E_LEXER_STATES
+enum E_ARG_TYPE
 {
-    case START;
-    case KEYWORD;
-    case IDENTIFIER;
+    case VAR;
+    case SYMB;
+    case LABEL;
+    case TYPE;
 }
 
-enum E_LEXER_TOKENS: string
-{
-    case END_OF_FILE = 'END_OF_FILE';
-    case IDENTIFIER = 'IDENTIFIER';
-    case KEYWORD_TRUE = 'KEYWORD_TRUE';
-    case KEYWORD_FALSE = 'KEYWORD_FALSE';
-    case COMMAND = 'COMMAND';
-
-    public function toString(): string
-    {
-        return $this->value;
-    }
-}
-
-global $KEYWORD_MAP;
-$KEYWORD_MAP = [
-    'true'  => E_LEXER_TOKENS::KEYWORD_TRUE,
-    'false' => E_LEXER_TOKENS::KEYWORD_FALSE,
-];
-
-/**
- * Class CodeCommand
- *
- * This class represents a command in the code IPPCode23
- */
-class CodeCommand
+class CodeCommandB
 {
     /**
      * CodeCommand constructor.
      *
-     * @param string $command The command string.
-     * @param int $args_count The number of arguments.
+     * @param string       $command The command string.
+     * @param E_ARG_TYPE[] $args    The arguments of the command.
      */
     public function __construct(
         private readonly string $command,
-        private readonly int $args_count
-    ) {
+        private readonly array $args
+    )
+    {
     }
 
     /**
@@ -57,256 +34,621 @@ class CodeCommand
     }
 
     /**
-     * Getter for the number of arguments
-     *
-     * @return int
+     * @return array
      */
-    public function getArgsCount(): int
+    public function getArgs(): array
     {
-        return $this->args_count;
+        return $this->args;
     }
 }
 
-global $CODE_COMMANDS;
-$CODE_COMMANDS = [
+global $CODE_COMMANDS_B;
+$CODE_COMMANDS_B = [
     // Scopes operations, function calls and returns
-    'MOVE'        => new CodeCommand('MOVE', 2),
-    'CREATEFRAME' => new CodeCommand('CREATEFRAME', 0),
-    'PUSHFRAME'   => new CodeCommand('PUSHFRAME', 0),
-    'POPFRAME'    => new CodeCommand('POPFRAME', 0),
-    'DEFVAR'      => new CodeCommand('DEFVAR', 1),
-    'CALL'        => new CodeCommand('CALL', 1),
-    'RETURN'      => new CodeCommand('RETURN', 0),
+    'MOVE'        => new CodeCommandB('MOVE', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::SYMB,
+    ]),
+    'CREATEFRAME' => new CodeCommandB('CREATEFRAME', []),
+    'PUSHFRAME'   => new CodeCommandB('PUSHFRAME', []),
+    'POPFRAME'    => new CodeCommandB('POPFRAME', []),
+    'DEFVAR'      => new CodeCommandB('DEFVAR', [
+        E_ARG_TYPE::VAR,
+    ]),
+    'CALL'        => new CodeCommandB('CALL', [
+        E_ARG_TYPE::LABEL,
+    ]),
+    'RETURN'      => new CodeCommandB('RETURN', []),
 
     // Stack operations
-    'PUSHS' => new CodeCommand('PUSHS', 1),
-    'POPS'  => new CodeCommand('POPS', 1),
+    'PUSHS'       => new CodeCommandB('PUSHS', [
+        E_ARG_TYPE::SYMB,
+    ]),
+    'POPS'        => new CodeCommandB('POPS', [
+        E_ARG_TYPE::VAR,
+    ]),
 
     // Arithmetic, relation, boolean and conversion operations
-    'ADD'      => new CodeCommand('ADD', 3),
-    'SUB'      => new CodeCommand('SUB', 3),
-    'MUL'      => new CodeCommand('MUL', 3),
-    'IDIV'     => new CodeCommand('IDIV', 3),
-    'LT'       => new CodeCommand('LT', 3),
-    'GT'       => new CodeCommand('GT', 3),
-    'EQ'       => new CodeCommand('EQ', 3),
-    'AND'      => new CodeCommand('AND', 3),
-    'OR'       => new CodeCommand('OR', 3),
-    'NOT'      => new CodeCommand('NOT', 2),
-    'INT2CHAR' => new CodeCommand('INT2CHAR', 2),
-    'STRI2INT' => new CodeCommand('STRI2INT', 3),
+    'ADD'         => new CodeCommandB('ADD', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::SYMB,
+        E_ARG_TYPE::SYMB,
+    ]),
+    'SUB'         => new CodeCommandB('SUB', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::SYMB,
+        E_ARG_TYPE::SYMB,
+    ]),
+    'MUL'         => new CodeCommandB('MUL', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::SYMB,
+        E_ARG_TYPE::SYMB,
+    ]),
+    'IDIV'        => new CodeCommandB('IDIV', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::SYMB,
+        E_ARG_TYPE::SYMB,
+    ]),
+    'LT'          => new CodeCommandB('LT', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::SYMB,
+        E_ARG_TYPE::SYMB,
+    ]),
+    'GT'          => new CodeCommandB('GT', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::SYMB,
+        E_ARG_TYPE::SYMB,
+    ]),
+    'EQ'          => new CodeCommandB('EQ', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::SYMB,
+        E_ARG_TYPE::SYMB,
+    ]),
+    'AND'         => new CodeCommandB('AND', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::SYMB,
+        E_ARG_TYPE::SYMB,
+    ]),
+    'OR'          => new CodeCommandB('OR', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::SYMB,
+        E_ARG_TYPE::SYMB,
+    ]),
+    'NOT'         => new CodeCommandB('NOT', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::SYMB,
+    ]),
+    'INT2CHAR'    => new CodeCommandB('INT2CHAR', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::SYMB,
+    ]),
+    'STRI2INT'    => new CodeCommandB('STRI2INT', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::SYMB,
+        E_ARG_TYPE::SYMB,
+    ]),
 
     // IO operations
-    'READ'  => new CodeCommand('READ', 2),
-    'WRITE' => new CodeCommand('WRITE', 1),
+    'READ'        => new CodeCommandB('READ', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::TYPE,
+    ]),
+    'WRITE'       => new CodeCommandB('WRITE', [
+        E_ARG_TYPE::SYMB,
+    ]),
 
     // String operations
-    'CONCAT'  => new CodeCommand('CONCAT', 3),
-    'STRLEN'  => new CodeCommand('STRLEN', 2),
-    'GETCHAR' => new CodeCommand('GETCHAR', 3),
-    'SETCHAR' => new CodeCommand('SETCHAR', 3),
+    'CONCAT'      => new CodeCommandB('CONCAT', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::SYMB,
+        E_ARG_TYPE::SYMB,
+    ]),
+    'STRLEN'      => new CodeCommandB('STRLEN', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::SYMB,
+    ]),
+    'GETCHAR'     => new CodeCommandB('GETCHAR', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::SYMB,
+        E_ARG_TYPE::SYMB,
+    ]),
+    'SETCHAR'     => new CodeCommandB('SETCHAR', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::SYMB,
+        E_ARG_TYPE::SYMB,
+    ]),
 
     // Type operations
-    'TYPE' => new CodeCommand('TYPE', 2),
+    'TYPE'        => new CodeCommandB('TYPE', [
+        E_ARG_TYPE::VAR,
+        E_ARG_TYPE::SYMB,
+    ]),
 
     // Jump operations
-    'LABEL'     => new CodeCommand('LABEL', 1),
-    'JUMP'      => new CodeCommand('JUMP', 1),
-    'JUMPIFEQ'  => new CodeCommand('JUMPIFEQ', 3),
-    'JUMPIFNEQ' => new CodeCommand('JUMPIFNEQ', 3),
-    'EXIT'      => new CodeCommand('EXIT', 1),
+    'LABEL'       => new CodeCommandB('LABEL', [
+        E_ARG_TYPE::LABEL,
+    ]),
+    'JUMP'        => new CodeCommandB('JUMP', [
+        E_ARG_TYPE::LABEL,
+    ]),
+    'JUMPIFEQ'    => new CodeCommandB('JUMPIFEQ', [
+        E_ARG_TYPE::LABEL,
+        E_ARG_TYPE::SYMB,
+        E_ARG_TYPE::SYMB,
+    ]),
+    'JUMPIFNEQ'   => new CodeCommandB('JUMPIFNEQ', [
+        E_ARG_TYPE::LABEL,
+        E_ARG_TYPE::SYMB,
+        E_ARG_TYPE::SYMB,
+    ]),
+    'EXIT'        => new CodeCommandB('EXIT', [
+        E_ARG_TYPE::SYMB,
+    ]),
 
     // Debug operations
-    'DPRINT' => new CodeCommand('DPRINT', 1),
-    'BREAK'  => new CodeCommand('BREAK', 0),
+    'DPRINT'      => new CodeCommandB('DPRINT', [
+        E_ARG_TYPE::SYMB,
+    ]),
+    'BREAK'       => new CodeCommandB('BREAK', []),
 ];
 
-/**
- * Class LexicalToken
- */
-class LexicalToken
+class CodeCommandArgument
 {
-    /**
-     * LexicalToken constructor.
-     *
-     * @param string $value The value of the token
-     * @param E_LEXER_TOKENS $type The type of the token
-     */
+    private ?string $label = null;
+
+    private ?string $frame = null;
+
+    private ?string $var = null;
+
+    private ?string $symb = null;
+
+    private ?string $type = null;
+
     public function __construct(
-        private readonly string $value,
-        private readonly E_LEXER_TOKENS $type
-    ) {
+        private E_ARG_TYPE $argType, private readonly string $input
+    )
+    {
+        $this->processInput();
     }
 
-    /**
-     * Getter for the value of the token
-     *
-     * @return string
-     */
-    public function getValue(): string
+    private function processInput(): void
     {
-        return $this->value;
-    }
+        $allowedTyped = ['int', 'bool', 'string', 'nil'];
 
-    /**
-     * Getter for the type of the token
-     *
-     * @return E_LEXER_TOKENS
-     */
-    public function getType(): E_LEXER_TOKENS
-    {
-        return $this->type;
-    }
+        switch ($this->argType) {
+        case E_ARG_TYPE::LABEL:
+            $this->label = $this->input;
+            break;
+        case E_ARG_TYPE::TYPE:
+            if (!in_array($this->input, $allowedTyped)) {
+                fprintf(STDERR, "ERROR: Invalid type '%s'", $this->input);
+                exit(23);
+            }
+            $this->type = $this->input;
+            break;
+        case E_ARG_TYPE::VAR:
+            $splitVar = explode('@', $this->input);
 
-    public function __toString(): string
-    {
-        return 'LexicalToken(value: "'.$this->value.'", type: '
-            .$this->type->toString().')';
-    }
-}
-
-/**
- * Class LexicalAnalysis
- *
- * This class is responsible for lexical analysis of the input string
- */
-class LexicalAnalysis
-{
-    private E_LEXER_STATES $current_state = E_LEXER_STATES::START;
-
-    private int $input_string_index = -1;
-
-    /**
-     * LexicalAnalysis constructor.
-     *
-     * @param string $input The input string to be processed
-     */
-    public function __construct(private readonly string $input)
-    {
-    }
-
-    /**
-     * Processes the next token in the input string
-     *
-     * @return LexicalToken
-     * @throws Exception
-     */
-    private function processNextToken(): LexicalToken
-    {
-        $token_string = '';
-
-        while (true) {
-            $this->input_string_index++;
-            if ($this->input_string_index >= strlen($this->input)) {
-                $current_char = '\0';
-            } else {
-                $current_char = $this->input[$this->input_string_index];
+            if (count($splitVar) !== 2) {
+                fprintf(STDERR, "ERROR: Invalid variable '%s'", $this->input);
+                exit(23);
             }
 
-            switch ($this->current_state) {
-                case E_LEXER_STATES::START:
-                    switch ($current_char) {
-                        case ' ':
-                        case '\t':
-                        case '\n':
-                        case '\r':
-                            break;
-                        case '\0':
-                            return new LexicalToken('', E_LEXER_TOKENS::END_OF_FILE);
-                        default:
-                            if (preg_match('/^[a-zA-Z]$/', $current_char)) {
-                                $this->current_state = E_LEXER_STATES::KEYWORD;
-                                $token_string .= $current_char;
-                                break;
-                            } else {
-                                throw new Exception(
-                                    'Unexpected character: '.$current_char
-                                );
-                            }
-                    }
-                    break;
-                case E_LEXER_STATES::KEYWORD:
-                    if (preg_match('/^[a-zA-Z]$/', $current_char)) {
-                        $token_string .= $current_char;
-                        break;
-                    } else {
-                        $command_keys = array_keys($GLOBALS['CODE_COMMANDS']);
-                        $keyword_keys = array_keys($GLOBALS['KEYWORD_MAP']);
+            if (!in_array($splitVar[0], ['GF', 'LF', 'TF'])) {
+                fprintf(
+                    STDERR, "ERROR: Invalid variable frame '%s'", $splitVar[0]
+                );
+                exit(23);
+            }
 
-                        if (in_array($token_string, $command_keys)) {
-                            $this->current_state = E_LEXER_STATES::START;
+            $this->checkVariableName($splitVar[1]);
 
-                            return new LexicalToken(
-                                $token_string,
-                                E_LEXER_TOKENS::COMMAND
-                            );
-                        } else {
-                            if (in_array($token_string, $keyword_keys)) {
-                                $this->current_state = E_LEXER_STATES::START;
+            $this->frame = $splitVar[0];
+            $this->var = $splitVar[1];
+            break;
+        case E_ARG_TYPE::SYMB:
+            $splitSymb = explode('@', $this->input, 2);
 
-                                return new LexicalToken(
-                                    $token_string,
-                                    $GLOBALS['KEYWORD_MAP'][$token_string]
-                                );
-                            } else {
-                                $this->current_state = E_LEXER_STATES::IDENTIFIER;
-                            }
-                        }
+            if (count($splitSymb) !== 2) {
+                fprintf(STDERR, "ERROR: Invalid symbol '%s'", $this->input);
+                exit(23);
+            }
 
-                        $this->input_string_index--;
-                    }
-                    break;
-                case E_LEXER_STATES::IDENTIFIER:
-                    if (preg_match('/^[a-zA-Z]$/', $current_char)) {
-                        $token_string .= $current_char;
-                    } else {
-                        $this->current_state = E_LEXER_STATES::START;
+            if (!in_array(
+                $splitSymb[0],
+                ['GF', 'LF', 'TF', 'int', 'bool', 'string', 'nil']
+            )
+            ) {
+                fprintf(
+                    STDERR, "ERROR: Invalid symbol type '%s'", $splitSymb[0]
+                );
+                exit(23);
+            }
 
-                        return new LexicalToken(
-                            $token_string,
-                            E_LEXER_TOKENS::IDENTIFIER
-                        );
-                    }
-                    break;
+            if ($splitSymb[0] === 'int' || $splitSymb[0] === 'bool'
+                || $splitSymb[0] === 'string'
+                || $splitSymb[0] === 'nil'
+            ) {
+                if ($splitSymb[0] === 'int') {
+                    $this->checkInt($splitSymb[1]);
+                } elseif ($splitSymb[0] === 'bool') {
+                    $this->checkBool($splitSymb[1]);
+                } elseif ($splitSymb[0] === 'string') {
+                    $this->checkString($splitSymb[1]);
+                } elseif ($splitSymb[0] === 'nil') {
+                    $this->checkNil($splitSymb[1]);
+                }
+
+                $this->type = $splitSymb[0];
+                $this->symb = $splitSymb[1];
+
+                if ($this->type === "string") {
+                    $this->symb = $this->processString($this->symb);
+                }
+            } else {
+                $this->checkVariableName($splitSymb[1]);
+
+                $this->argType = E_ARG_TYPE::VAR;
+
+                $this->frame = $splitSymb[0];
+                $this->var = $splitSymb[1];
             }
         }
     }
 
-    /**
-     * Returns the next token in the input string
-     *
-     * @return LexicalToken
-     * @throws Exception
-     */
-    public function getNextToken(): LexicalToken
+    private function checkVariableName(string $name): void
     {
-        return $this->processNextToken();
+        $allowedSpecialCharacters = ['_', '-', '$', '&', '%', '*', '!', '?'];
+        $allowedStartCharacters = array_merge(
+            range('a', 'z'), range('A', 'Z'), $allowedSpecialCharacters
+        );
+        $allowedCharacters = array_merge(
+            $allowedStartCharacters, range('0', '9')
+        );
+
+        if (!in_array($name[0], $allowedStartCharacters)) {
+            fprintf(STDERR, "ERROR: Invalid variable name '%s'", $name);
+            exit(23);
+        }
+
+        for ($i = 1; $i < strlen($name); $i++) {
+            if (!in_array($name[$i], $allowedCharacters)) {
+                fprintf(STDERR, "ERROR: Invalid variable name '%s'", $name);
+                exit(23);
+            }
+        }
+    }
+
+    private function checkBool(string $bool): void
+    {
+        if ($bool !== 'true' && $bool !== 'false') {
+            fprintf(STDERR, "ERROR: Invalid bool '%s'", $bool);
+            exit(23);
+        }
+    }
+
+    private function checkInt(string $int): void
+    {
+        if (preg_match('/^[-+]?[0-9]+$/', $int) === 0) {
+            fprintf(STDERR, "ERROR: Invalid int '%s'", $int);
+            exit(23);
+        }
+    }
+
+    private function checkString(string $string): void
+    {
+    }
+
+    private function processString(string $string): string
+    {
+        for ($i = 0; $i < strlen($string); $i++) {
+            if (ord($string[$i]) <= 32
+                || ord($string[$i]) === 35
+                || ord($string[$i]) === 92
+            ) {
+                $escapedNumber = sprintf("%03d", decoct(ord($string[$i])));
+
+                $string = substr_replace(
+                    $string, "\\$escapedNumber", $i, 1
+                );
+            }
+        }
+
+        return $string;
+    }
+
+    private function checkNil(string $nil): void
+    {
+        if ($nil !== 'nil') {
+            fprintf(STDERR, "ERROR: Invalid nil '%s'", $nil);
+            exit(23);
+        }
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLabel(): ?string
+    {
+        return $this->label;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFrame(): ?string
+    {
+        return $this->frame;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getVar(): ?string
+    {
+        return $this->var;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSymb(): ?string
+    {
+        return $this->symb;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function getArgType(): E_ARG_TYPE
+    {
+        return $this->argType;
+    }
+
+    public function getInput(): string
+    {
+        return $this->input;
+    }
+}
+
+function remove_comments(string $input): string
+{
+    $input = preg_replace('/#.*$/m', '', $input);
+    $input = preg_replace('/\h+/m', ' ', $input);
+    $input = preg_replace('/^(\h+)|(\h+)$/m', '', $input);
+    $input = preg_replace('/^\h*$/m', '', $input);
+    $input = preg_replace('/\R\R+/', "\n", $input);
+    $input = preg_replace('/\R$/', '', $input);
+    $input = preg_replace('/^\R/', '', $input);
+
+    return $input;
+}
+
+function is_command_right(string $command): void
+{
+    global $CODE_COMMANDS_B;
+
+    if (!in_array(strtoupper($command), array_keys($CODE_COMMANDS_B))) {
+        fprintf(STDERR, 'Unknown command: %s' . PHP_EOL, $command);
+        exit(22);
+    }
+}
+
+function is_args_right(string $command, array $argsArray): bool
+{
+    global $CODE_COMMANDS_B;
+
+    /** @var CodeCommandB $currentCommand */
+    $currentCommand = $CODE_COMMANDS_B[$command];
+
+    if (count($argsArray) !== count($currentCommand->getArgs())) {
+        fprintf(
+            STDERR, 'Wrong number of arguments for command: %s' . PHP_EOL,
+            $command
+        );
+        exit(23);
+    }
+
+    return true;
+}
+
+class XMLManager
+{
+    private XMLWriter $xw;
+
+    /**
+     * XMLManager constructor.
+     *
+     * Private constructor to prevent creating a new instance of the
+     * *Singleton* via the `new` operator from outside of this class.
+     */
+    private function __construct()
+    {
+        $this->xw = xmlwriter_open_memory();
+        xmlwriter_set_indent($this->xw, 1);
+        $res = xmlwriter_set_indent_string($this->xw, ' ');
+
+        xmlwriter_start_document($this->xw, '1.0', 'UTF-8');
+    }
+
+    /**
+     * Get the XMLManager instance.
+     *
+     * @return XMLManager the *Singleton* instance.
+     */
+    public static function getInstance(): XMLManager
+    {
+        static $instance = null;
+        if ($instance === null) {
+            $instance = new XMLManager();
+        }
+        return $instance;
+    }
+
+    public function startProgram(): void
+    {
+        xmlwriter_start_element($this->xw, 'program');
+        xmlwriter_start_attribute($this->xw, 'language');
+        xmlwriter_text($this->xw, 'IPPcode23');
+        xmlwriter_end_attribute($this->xw);
+    }
+
+    public function endProgram(): void
+    {
+        xmlwriter_end_element($this->xw);
+        xmlwriter_end_document($this->xw);
+    }
+
+    /**
+     * Generate instruction element with attributes and nested arguments.
+     *
+     * @param string                $command       The command to generate.
+     * @param int                   $order         The order of the
+     *                                             instruction.
+     * @param CodeCommandArgument[] $args          The arguments of the
+     *                                             instruction.
+     *
+     * @return void
+     */
+    public function addInstruction(
+        string $command,
+        int $order,
+        array $args
+    ): void
+    {
+        global $CODE_COMMANDS_B;
+        $currentCommand = $CODE_COMMANDS_B[$command];
+        $argumentsCount = count($currentCommand->getArgs());
+
+        xmlwriter_start_element($this->xw, 'instruction');
+
+        xmlwriter_start_attribute($this->xw, 'order');
+        xmlwriter_text($this->xw, $order);
+        xmlwriter_end_attribute($this->xw);
+
+        xmlwriter_start_attribute($this->xw, 'opcode');
+        xmlwriter_text($this->xw, strtoupper($command));
+        xmlwriter_end_attribute($this->xw);
+
+        if ($argumentsCount === 0) {
+            xmlwriter_end_element($this->xw);
+            return;
+        }
+
+        foreach ($args as $index => $arg) {
+            $this->addAttribute($index, $arg);
+        }
+
+        xmlwriter_end_element($this->xw);
+    }
+
+    /**
+     * Add attribute to the instruction element.
+     *
+     * @param int                 $index The index of the argument.
+     * @param CodeCommandArgument $arg   The argument to add.
+     *
+     * @return void
+     */
+    public function addAttribute(int $index, CodeCommandArgument $arg
+    ): void
+    {
+        xmlwriter_start_element($this->xw, 'arg' . $index + 1);
+        xmlwriter_start_attribute($this->xw, 'type');
+
+        if ($arg->getArgType() === E_ARG_TYPE::LABEL) {
+            xmlwriter_text($this->xw, 'label');
+        } elseif ($arg->getArgType() === E_ARG_TYPE::TYPE) {
+            xmlwriter_text($this->xw, 'type');
+        } elseif ($arg->getArgType() === E_ARG_TYPE::VAR) {
+            xmlwriter_text($this->xw, 'var');
+        } elseif ($arg->getArgType() === E_ARG_TYPE::SYMB) {
+            xmlwriter_text($this->xw, $arg->getType());
+        }
+
+        xmlwriter_end_attribute($this->xw);
+
+        if ($arg->getArgType() === E_ARG_TYPE::LABEL) {
+            xmlwriter_text($this->xw, $arg->getLabel());
+        } elseif ($arg->getArgType() === E_ARG_TYPE::TYPE) {
+            xmlwriter_text($this->xw, $arg->getType());
+        } elseif ($arg->getArgType() === E_ARG_TYPE::VAR) {
+            xmlwriter_text(
+                $this->xw, $arg->getFrame() . "@" . $arg->getVar()
+            );
+        } elseif ($arg->getArgType() === E_ARG_TYPE::SYMB) {
+            xmlwriter_text($this->xw, $arg->getSymb());
+        }
+
+        xmlwriter_end_element($this->xw);
+    }
+
+    public function output(): string
+    {
+        return xmlwriter_output_memory($this->xw);
     }
 }
 
 function main(): void
 {
-//    $stdin = fopen("php://stdin", "r");
-    $input_string = 'ab ac false MOVE true';
+    global $CODE_COMMANDS_B;
 
-    /** @var LexicalToken[] $tokens */
-    $tokens = [];
+    $input = ".IPPcode23  # nacteni vstupu a vypis
+DEFVAR GF@a
+READ GF@a int
+WRITE GF@a
+WRITE string@\032<not-tag/>\032 # řetězec převádíme, aby byl správně uložen do XML elementu
+WRITE bool@true#zapisujeme malými písmeny";
 
-    $lexicalAnalysis = new LexicalAnalysis($input_string);
+    $input = remove_comments($input);
 
-    try {
-        $token = $lexicalAnalysis->getNextToken();
-        while ($token->getType() !== E_LEXER_TOKENS::END_OF_FILE) {
-            $tokens[] = $token;
-            $token = $lexicalAnalysis->getNextToken();
+    $lines = preg_split('/\R/', $input);
+
+    XMLManager::getInstance()->startProgram();
+
+    foreach ($lines as $index => $line) {
+        if ($index === 0) {
+            if ($line !== '.IPPcode23') {
+                fprintf(STDERR, 'Wrong header: ' . $line . PHP_EOL);
+                exit(21);
+            }
+            continue;
         }
 
-        foreach ($tokens as $token) {
-            echo $token."\n";
+        $commandArray = explode(' ', $line, 2);
+
+        is_command_right($commandArray[0]);
+
+        $currentCommand = $CODE_COMMANDS_B[$commandArray[0]];
+        $argumentsCount = count($currentCommand->getArgs());
+
+        $argumentsArray = explode(' ', $commandArray[1], $argumentsCount);
+
+        is_args_right($commandArray[0], $argumentsArray);
+
+        $args = [];
+
+        foreach ($argumentsArray as $key => $value) {
+            $argType = $currentCommand->getArgs()[$key];
+
+            $parsedCommand = new CodeCommandArgument($argType, $value);
+
+            $args[] = $parsedCommand;
         }
-    } catch (Exception $e) {
-        echo $e->getMessage();
+
+        XMLManager::getInstance()->addInstruction(
+            $currentCommand->getCommand(), $index, $args
+        );
     }
+
+    XMLManager::getInstance()->endProgram();
+
+    echo XMLManager::getInstance()->output();
 }
 
 main();
