@@ -230,6 +230,9 @@ class CodeCommandArgument
     private function processInput(): void
     {
         $allowedTyped = ['int', 'bool', 'string', 'nil'];
+        $allowedFrames = ['GF', 'LF', 'TF'];
+
+        $allowedPrefixes = array_merge($allowedTyped, $allowedFrames);
 
         switch ($this->argType) {
         case E_ARG_TYPE::LABEL:
@@ -250,7 +253,7 @@ class CodeCommandArgument
                 exit(23);
             }
 
-            if (!in_array($splitVar[0], ['GF', 'LF', 'TF'])) {
+            if (!in_array($splitVar[0], $allowedFrames)) {
                 fprintf(
                     STDERR, "ERROR: Invalid variable frame '%s'", $splitVar[0]
                 );
@@ -270,18 +273,15 @@ class CodeCommandArgument
                 exit(23);
             }
 
-            if (!in_array(
-                $splitSymb[0],
-                ['GF', 'LF', 'TF', 'int', 'bool', 'string', 'nil']
-            )
-            ) {
+            if (!in_array($splitSymb[0], $allowedPrefixes)) {
                 fprintf(
                     STDERR, "ERROR: Invalid symbol type '%s'", $splitSymb[0]
                 );
                 exit(23);
             }
 
-            if ($splitSymb[0] === 'int' || $splitSymb[0] === 'bool'
+            if ($splitSymb[0] === 'int'
+                || $splitSymb[0] === 'bool'
                 || $splitSymb[0] === 'string'
                 || $splitSymb[0] === 'nil'
             ) {
@@ -705,12 +705,12 @@ function main(): void
 {
     global $CODE_COMMANDS;
 
-    $input = ".IPPcode23  # nacteni vstupu a vypis
+    $input = ".IPPcode23
 DEFVAR GF@a
 READ GF@a int
 WRITE GF@a
-WRITE string@\032<not-tag/>\032 # řetězec převádíme, aby byl správně uložen do XML elementu
-WRITE bool@true#zapisujeme malými písmeny";
+WRITE string@\032<not-tag/>\032
+WRITE bool@true";
 
     $input = remove_comments($input);
 
