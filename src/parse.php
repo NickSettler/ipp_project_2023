@@ -197,6 +197,8 @@ class CodeCommandArgument
 
         switch ($this->argType) {
         case E_ARG_TYPE::LABEL:
+            $this->checkVariableName($this->input);
+
             $this->label = $this->input;
             break;
         case E_ARG_TYPE::TYPE:
@@ -295,13 +297,13 @@ class CodeCommandArgument
         );
 
         if (!in_array($name[0], $allowedStartCharacters)) {
-            fprintf(STDERR, "ERROR: Invalid variable name '%s'", $name);
+            fprintf(STDERR, "ERROR: Invalid argument '%s'", $name);
             exit(23);
         }
 
         for ($i = 1; $i < strlen($name); $i++) {
             if (!in_array($name[$i], $allowedCharacters)) {
-                fprintf(STDERR, "ERROR: Invalid variable name '%s'", $name);
+                fprintf(STDERR, "ERROR: Invalid argument '%s'", $name);
                 exit(23);
             }
         }
