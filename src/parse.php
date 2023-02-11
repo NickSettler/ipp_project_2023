@@ -513,28 +513,49 @@ function is_command_right(string $command): void
 {
     global $CODE_COMMANDS;
 
-    if (!in_array(strtoupper($command), array_keys($CODE_COMMANDS))) {
+    if (!in_array($command, array_keys($CODE_COMMANDS))) {
         fprintf(STDERR, 'Unknown command: %s' . PHP_EOL, $command);
         exit(22);
     }
 }
 
 /**
- * Checks if the number of arguments is correct.
+ * Parses the argument string and returns the array with arguments.
  *
- * @param string $command   The command to check.
- * @param array  $argsArray The array of arguments.
+ * @param string $command    The command to check.
+ * @param string $argsString The string with arguments.
  *
- * @return bool True if the number of arguments is correct.
+ * @return string[] The array with arguments.
  */
-function is_args_right(string $command, array $argsArray): bool
+function parse_command_args(string $command, string $argsString): array
 {
     global $CODE_COMMANDS;
 
     /** @var CodeCommand $currentCommand */
     $currentCommand = $CODE_COMMANDS[$command];
+    $commandArgumentsCount = count($currentCommand->getArgs());
 
-    if (count($argsArray) !== count($currentCommand->getArgs())) {
+    if ($commandArgumentsCount === 0) {
+        if (strlen($argsString) !== 0) {
+            fprintf(
+                STDERR, 'Wrong number of arguments for command: %s' . PHP_EOL,
+                $command
+            );
+            exit(23);
+        }
+
+        return [];
+    }
+
+    $argumentsArray = explode(' ', $argsString, $commandArgumentsCount);
+
+    $allArgsPresented = array_every($argumentsArray, function ($arg) {
+        return strlen($arg) !== 0;
+    });
+
+    if (count($argumentsArray) !== $commandArgumentsCount
+        || !$allArgsPresented
+    ) {
         fprintf(
             STDERR, 'Wrong number of arguments for command: %s' . PHP_EOL,
             $command
@@ -542,7 +563,7 @@ function is_args_right(string $command, array $argsArray): bool
         exit(23);
     }
 
-    return true;
+    return $argumentsArray;
 }
 
 /**
@@ -729,21 +750,19 @@ WRITE bool@true";
         is_command_right($commandArray[0]);
 
         $currentCommand = $CODE_COMMANDS[$commandArray[0]];
-        $argumentsCount = count($currentCommand->getArgs());
 
-        $argumentsArray = explode(' ', $commandArray[1], $argumentsCount);
-
-        is_args_right($commandArray[0], $argumentsArray);
+        $argumentsArray = parse_command_args(
+            $commandArray[0], count($commandArray) > 1 ? $commandArray[1] : ''
+        );
 
         $args = [];
 
         foreach ($argumentsArray as $key => $value) {
             $argType = $currentCommand->getArgs()[$key];
-
             $parsedCommand = new CodeCommandArgument($argType, $value);
-
             $args[] = $parsedCommand;
         }
+
 
         XMLManager::getInstance()->addInstruction(
             $currentCommand->getCommand(), $index, $args
