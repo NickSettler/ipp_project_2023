@@ -708,13 +708,8 @@ function main(): void
 {
     global $CODE_COMMANDS;
 
-    $input = ".IPPcode23
-DEFVAR GF@a
-READ GF@a int
-WRITE GF@a
-WRITE string@\032<not-tag/>\032
-WRITE bool@true";
-
+    $input = fopen("php://stdin", "r");
+    $input = stream_get_contents($input);
     $input = remove_comments($input);
 
     $lines = preg_split('/\R/', $input);
