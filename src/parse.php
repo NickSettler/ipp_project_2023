@@ -468,21 +468,6 @@ function array_every(array $arr, callable $predicate): bool
 }
 
 /**
- * Checks if any element of the array satisfies the predicate.
- *
- * @param array    $arr       The array to check.
- * @param callable $predicate The predicate to check the elements of the array.
- *
- * @return bool true if any element of the array satisfies the predicate
- */
-function array_any(array $arr, callable $predicate): bool
-{
-    return !array_every($arr, function ($e) use ($predicate) {
-        return !call_user_func($predicate, $e);
-    });
-}
-
-/**
  * Removes comments and useless symbols from the input.
  *
  * @param string $input The input to process.
