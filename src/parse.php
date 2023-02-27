@@ -704,8 +704,29 @@ class XMLManager
     }
 }
 
+function print_help(): void
+{
+    echo 'Script for parsing IPPcode23 code to XML.' . PHP_EOL;
+    echo 'Usage: parse.php [options]' . PHP_EOL;
+    echo 'Options:' . PHP_EOL;
+    echo '  -h, --help  Print this help.' . PHP_EOL;
+    echo 'Author: Nikita Moiseev <xmoise01@stud.fit.vutbr.cz>' . PHP_EOL;
+}
+
+function process_args(): void
+{
+    $options = getopt('h', ['help']);
+
+    if (isset($options['h']) || isset($options['help'])) {
+        print_help();
+        exit(0);
+    }
+}
+
 function main(): void
 {
+    process_args();
+
     global $CODE_COMMANDS;
 
     $input = fopen("php://stdin", "r");
